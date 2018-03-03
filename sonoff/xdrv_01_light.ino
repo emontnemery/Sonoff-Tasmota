@@ -516,9 +516,17 @@ char* LightGetColor(uint8_t type, char* scolor)
   scolor[0] = '\0';
   for (byte i = 0; i < light_subtype; i++) {
     if (!type && Settings.flag.decimal_text) {
+#if 0
       snprintf_P(scolor, 25, PSTR("%s%s%d"), scolor, (i > 0) ? "," : "", light_current_color[i]);
+#else
+      snprintf_P(scolor, 25, PSTR("%s%s%d"), scolor, (i > 0) ? "," : "", Settings.light_color[i]);
+#endif
     } else {
+#if 0
       snprintf_P(scolor, 25, PSTR("%s%02X"), scolor, light_current_color[i]);
+#else
+      snprintf_P(scolor, 25, PSTR("%s%02X"), scolor, Settings.light_color[i]);
+#endif
     }
   }
   return scolor;
@@ -888,6 +896,14 @@ void LightHsbToRgb()
   light_current_color[0] = (uint8_t)(r * 255.0f);
   light_current_color[1] = (uint8_t)(g * 255.0f);
   light_current_color[2] = (uint8_t)(b * 255.0f);
+  if (0.1f < light_saturation) {
+	  light_current_color[3] = 0;
+	  light_current_color[4] = 0;
+  }
+  
+  snprintf_P(log_data, sizeof(log_data), PSTR("LightHsbToRgb h: %u, s: %u, v: %u, r: %u, g: %u, b: %u, cw: %u, ww: %u"), 
+            (int)(h*1000), (int)(s*1000), (int)(v*1000), light_current_color[0], light_current_color[1], light_current_color[2], light_current_color[3], light_current_color[4]);
+  AddLog(LOG_LEVEL_DEBUG_MORE);                    // HTP: Hue POST args ({"on":false})
 }
 
 /********************************************************************************************/
@@ -1023,6 +1039,7 @@ boolean LightCommand()
       valid_entry = LightColorEntry(XdrvMailbox.data, XdrvMailbox.data_len);
       if (valid_entry) {
         if (XdrvMailbox.index <= 2) {    // Color(1), 2
+#if 0
           memcpy(light_current_color, light_entry_color, sizeof(light_current_color));
           uint8_t dimmer = Settings.light_dimmer;
           LightSetColor();
@@ -1031,6 +1048,11 @@ boolean LightCommand()
           }
           Settings.light_scheme = 0;
           coldim = true;
+#else
+          memcpy(Settings.light_color, light_entry_color, sizeof(Settings.light_color));
+          Settings.light_scheme = 0;
+          coldim = true;
+#endif
         } else {             // Color3, 4, 5 and 6
           for (byte i = 0; i < LST_RGB; i++) {
             Settings.ws_color[XdrvMailbox.index -3][i] = light_entry_color[i];

@@ -781,6 +781,8 @@ void HueGroups(String *path)
   WebServer->send(200, FPSTR(HDR_CTYPE_JSON), response);
 }
 
+// Bugs: Turns off when brightness is 255
+//       POST not working
 void HandleHueApi(String *path)
 {
   /* HUE API uses /api/<userid>/<command> syntax. The userid is created by the echo device and
