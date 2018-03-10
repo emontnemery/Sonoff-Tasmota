@@ -896,11 +896,9 @@ void LightHsbToRgb()
   light_current_color[0] = (uint8_t)(r * 255.0f);
   light_current_color[1] = (uint8_t)(g * 255.0f);
   light_current_color[2] = (uint8_t)(b * 255.0f);
-  if (0.1f < light_saturation) {
-	  light_current_color[3] = 0;
-	  light_current_color[4] = 0;
-  }
-  
+  light_current_color[3] = 0;
+  light_current_color[4] = 0;
+
   snprintf_P(log_data, sizeof(log_data), PSTR("LightHsbToRgb h: %u, s: %u, v: %u, r: %u, g: %u, b: %u, cw: %u, ww: %u"), 
             (int)(h*1000), (int)(s*1000), (int)(v*1000), light_current_color[0], light_current_color[1], light_current_color[2], light_current_color[3], light_current_color[4]);
   AddLog(LOG_LEVEL_DEBUG_MORE);                    // HTP: Hue POST args ({"on":false})
